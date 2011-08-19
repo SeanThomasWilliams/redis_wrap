@@ -1,59 +1,82 @@
+import unittest
+
 from redis_wrap import get_redis, get_list, get_hash, get_set
 
 
-def setup_module(module=None):
-    get_redis().delete('bears')
-    get_redis().delete('villains')
-    get_redis().delete('fishes')
+class TestBase(unittest.TestCase):
+    def setUp(self):
+        get_redis().delete(u'bears')
+        get_redis().delete(u'villains')
+        get_redis().delete(u'fishes')
+
+class TestList(TestBase):
+    def test_list(self):
+        bears = get_list(u'bears')
+
+        bears.append(u'grizzly')
+        self.assertEqual(len(bears), 1)
+
+        self.assertTrue(all(bear == u'grizzly' for bear in bears))
+
+        try:
+            self.assertIn(u'grizzly', bears)
+        except AttributeError: # needs to be changed
+            self.assertTrue(u'grizzly' in bears)
+
+        bears.extend([u'white bear', u'pedo bear'])
+        self.assertEqual(len(bears), 3)
 
 
-def test_list():
-    bears = get_list('bears')
+        bears.remove(u'grizzly')
+        try:
+            self.assertNotIn(u'grizzly', bears)
+        except AttributeError: # needs to be changed
+            self.assertTrue(u'grizzly' not in bears)
 
-    bears.append('grizzly')
-    assert len(bears) == 1
+class TestHash(TestBase):
+    def test_hash(self):
+        villains = get_hash(u'villains')
+        try:
+            self.assertNotIn(u'riddler', villains)
+        except AttributeError:
+            self.assertTrue(u'riddler' not in villains)
 
-    for bear in bears:
-        assert bear == 'grizzly'
+        villains[u'riddler'] = 'Edward Nigma'
+        try:
+            self.assertIn(u'riddler', villains)
+        except AttributeError:
+            self.assertTrue(u'riddler' in villains)
 
-    assert 'grizzly' in bears
+        self.assertEqual(villains.get(u'riddler'), u'Edward Nigma')
 
-    bears.extend(['white bear', 'pedo bear'])
-    assert len(bears) == 3
+        self.assertEqual(len(villains.keys()), 1)
+        self.assertEqual(villains.values(), [u'Edward Nigma'])
 
-    bears.remove('grizzly')
-    assert 'grizzly' not in bears
-
-
-def test_hash():
-    villains = get_hash('villains')
-    assert 'riddler' not in villains
-
-    villains['riddler'] = 'Edward Nigma'
-    assert 'riddler' in villains
-    assert villains.get('riddler') == 'Edward Nigma'
-
-    assert len(villains.keys()) == 1
-    assert villains.values() == ['Edward Nigma']
-
-    del villains['riddler']
-    assert len(villains.keys()) == 0
-    assert 'riddler' not in villains
+        del villains[u'riddler']
+        self.assertEqual(len(villains.keys()), 0)
+        try:
+            self.assertNotIn(u'riddler', villains)
+        except AttributeError:
+            self.assertTrue(u'riddler' not in villains)
 
 
-def test_set():
-    fishes = get_set('fishes')
-    assert 'nemo' not in fishes
+class TestSet(TestBase):
+    def test_set(self):
+        fishes = get_set(u'fishes')
+        try:
+            self.assertNotIn(u'nemo', fishes)
+        except AttributeError:
+            self.assertTrue(u'nemo' not in fishes)
 
-    fishes.add('nemo')
-    assert 'nemo' in fishes
+        fishes.add(u'nemo')
+        try:
+            self.assertIn(u'nemo', fishes)
+        except AttributeError:
+            self.assertTrue(u'nemo' in fishes)
 
-    for item in fishes:
-        assert item == 'nemo'
+        self.assertTrue(all(fish == u'nemo' for fish in fishes))
 
 
 if __name__ == '__main__':
-    setup_module()
-    test_list()
-    test_hash()
-    test_set()
+    unittest.main()
+
