@@ -166,6 +166,11 @@ class HashFu:
     def __contains__(self, key):
         return get_redis(self.system).hexists(self.name, key)
 
+    def update(self,other):
+        with get_redis(self.system).pipeline() as pipe:
+            for k,v in other.items():
+                pipe.hset(self.name,k,v)
+            pipe.execute()
 
 class SetFu:
 

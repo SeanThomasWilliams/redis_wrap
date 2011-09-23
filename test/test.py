@@ -53,6 +53,7 @@ class TestHash(TestBase):
             self.assertTrue(u'riddler' not in villains)
 
         villains[u'riddler'] = 'Edward Nigma'
+        villains[u'Magneto'] = 'Max Eisenhardt'
         try:
             self.assertIn(u'riddler', villains)
         except AttributeError:
@@ -60,11 +61,21 @@ class TestHash(TestBase):
 
         self.assertEqual(villains.get(u'riddler'), u'Edward Nigma')
 
-        self.assertEqual(len(villains.keys()), 1)
-        self.assertEqual(villains.values(), [u'Edward Nigma'])
+        self.assertEqual(len(villains.keys()), 2)
+        for expected,actual_key in zip([u'Magneto',u'riddler'],
+                sorted(villains.keys())):
+            self.assertEqual(expected,actual_key)
+        for expected,actual_value in zip([u'Edward Nigma',u'Max Eisenhardt'],
+                sorted(villains.values())):
+            self.assertEqual(expected,actual_value)
+
+
+        villains.update({'Green Goblin':'Norman Osborn','riddler':'E. Nigma'})
+        self.assertEqual(villains['Green Goblin'],'Norman Osborn')
+        self.assertEqual(villains['riddler'],'E. Nigma')
 
         del villains[u'riddler']
-        self.assertEqual(len(villains.keys()), 0)
+        self.assertEqual(len(villains.keys()), 2)
         try:
             self.assertNotIn(u'riddler', villains)
         except AttributeError:
