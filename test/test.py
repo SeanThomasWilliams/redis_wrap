@@ -26,6 +26,8 @@ class TestList(TestBase):
         bears.extend([u'white bear', u'pedo bear'])
         self.assertEqual(len(bears), 3)
 
+        bears[1] = u'polar bear'
+        self.assertEqual(bears[1],u'polar bear')
 
         bears.remove(u'grizzly')
         try:

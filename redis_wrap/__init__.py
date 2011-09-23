@@ -112,6 +112,10 @@ class ListFu:
             for item in items:
                 yield item
             i += 30
+    def __getitem__(self,item):
+        return get_redis(self.system).lindex(self.name,item)
+    def __setitem__(self,item,value):
+        get_redis(self.system).lset(self.name,item,value)
 
 
 class HashFu:
