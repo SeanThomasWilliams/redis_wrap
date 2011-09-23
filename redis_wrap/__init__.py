@@ -97,7 +97,14 @@ class ListFu:
     def pop(self, index=None):
         if index:
             raise ValueError('Not supported')
+        if index == 0:
+            return get_redis(self.system).lpop(self.name)
         return get_redis(self.system).rpop(self.name)
+
+    def insert(self,index,value):
+        if index != 0 :
+            raise ValueError('Not supported')
+        get_redis(self.system).lpush(self.name,value)
 
     def __len__(self):
         return get_redis(self.system).llen(self.name)

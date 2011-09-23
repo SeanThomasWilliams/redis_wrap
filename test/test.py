@@ -26,10 +26,13 @@ class TestList(TestBase):
 
         bears.extend([u'white bear', u'pedo bear'])
         self.assertEqual(len(bears), 3)
+        bears.insert(0,u'cartesian bear')
 
         for expected,actual in zip(bears,
-                [u'grizzly',u'white bear', u'pedo bear']):
+                [u'cartesian bear',u'grizzly',u'white bear', u'pedo bear']):
             self.assertEqual(expected,actual)
+        self.assertEqual(bears.pop(),u'pedo bear')
+        self.assertEqual(bears.pop(0),u'cartesian bear')
 
         bears[1] = u'polar bear'
         self.assertEqual(bears[1],u'polar bear')
