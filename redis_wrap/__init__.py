@@ -140,6 +140,12 @@ class HashFu:
     def values(self):
         return get_redis(self.system).hvals(self.name) or []
 
+    def items(self):
+        return zip(self.keys(),self.values())
+
+    def __iter__(self):
+        return iter(self.keys())
+
     def __len__(self):
         return get_redis(self.system).hlen(self.name) or 0
 
