@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 import unittest
 
 from redis_wrap import get_redis, get_list, get_hash, get_set
@@ -26,6 +27,10 @@ class TestList(TestBase):
         bears.extend([u'white bear', u'pedo bear'])
         self.assertEqual(len(bears), 3)
 
+        for expected,actual in zip(bears,
+                [u'grizzly',u'white bear', u'pedo bear']):
+            self.assertEqual(expected,actual)
+
         bears[1] = u'polar bear'
         self.assertEqual(bears[1],u'polar bear')
 
@@ -34,6 +39,7 @@ class TestList(TestBase):
             self.assertNotIn(u'grizzly', bears)
         except AttributeError: # needs to be changed
             self.assertTrue(u'grizzly' not in bears)
+
 
 class TestHash(TestBase):
     def test_hash(self):

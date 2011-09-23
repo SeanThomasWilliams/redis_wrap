@@ -85,7 +85,7 @@ class ListFu:
         self.system = system
 
     def append(self, item):
-        get_redis(self.system).lpush(self.name, item)
+        get_redis(self.system).rpush(self.name, item)
 
     def extend(self, iterable):
         for item in iterable:
