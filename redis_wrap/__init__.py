@@ -88,8 +88,10 @@ class ListFu:
         get_redis(self.system).rpush(self.name, item)
 
     def extend(self, iterable):
-        for item in iterable:
-            self.append(item)
+        with get_redis(self.system).pipeline() as pipe:
+            for item in iterable:
+                pipe.rpush(self.name,item)
+            pipe.execute()
 
     def remove(self, value):
         get_redis(self.system).lrem(self.name, value)
