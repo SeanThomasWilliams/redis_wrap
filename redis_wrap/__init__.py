@@ -183,31 +183,61 @@ class HashFu:
                 pipe.hset(self.name,k,v)
             pipe.execute()
 
-class SetFu:
-
-    def __init__(self, name, system):
+class SetFu():
+    def __init__(self, name, system): 
         self.name = name
         self.system = system
 
+    def __add__(self, item):
+        return self.add(item)
+
     def add(self, item):
-        get_redis(self.system).sadd(self.name, item)
+        return get_redis(self.system).sadd(self.name, item)
 
     def remove(self, item):
-        get_redis(self.system).srem(self.name, item)
+        return get_redis(self.system).srem(self.name, item)
 
     def pop(self, item):
         return get_redis(self.system).spop(self.name, item)
 
+    def __sub__(self, other):
+        return self.difference(other)
+    
+    def difference(self, other):
+        return get_redis(self.system).sdiff(self.name, other.name)
+    
+    def __and__(self, other):
+        return self.intersection(other)
+
+    def intersection(self, other):
+        return get_redis(self.system).sinter(self.name, other.name)
+    
+    def __xor__(self, other):
+        return self.symmetric_difference(other)
+
+    def symmetric_difference(self, other): 
+        return (self | other) - (self & other)
+
+    def __or__(self, other):
+        return self.union(other) 
+
+    def union(self, other):
+        return get_redis(self.system).sunion(self.name, other.name)
+
+    def items(self):
+        return get_redis(self.system).smembers(self.name)
+
     def __iter__(self):
-        client = get_redis(self.system)
-        for item in client.smembers(self.name):
+        for item in self.items():
             yield item
 
     def __len__(self):
-        return len(get_redis(self.system).smembers(self.name))
+        return get_redis(self.system).scard(self.name)
 
     def __contains__(self, item):
         return get_redis(self.system).sismember(self.name, item)
 
     def __repr__(self):
-        return str(get_redis(self.system).smembers(self.name))
+        return '%s(%r, set(%r))' % (self.__class__.__name__,
+                                    self.name,
+                                    self.items())
