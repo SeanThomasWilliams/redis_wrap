@@ -121,10 +121,15 @@ class ListFu:
             for item in items:
                 yield item
             i += 30
+
     def __getitem__(self,item):
         return get_redis(self.system).lindex(self.name,item)
+
     def __setitem__(self,item,value):
         get_redis(self.system).lset(self.name,item,value)
+
+    def __repr__(self):
+        return str([get_redis(self.system).lindex(self.name, i) for i in range(len(self))])
 
 
 class HashFu:
@@ -166,6 +171,12 @@ class HashFu:
     def __contains__(self, key):
         return get_redis(self.system).hexists(self.name, key)
 
+    def __repr__(self):
+        repr_dict = {}
+        for key in get_redis(self.sytem).hkeys(self.name):
+            repr_dict[key] = get_redis(self.system).hget(self.name, key)
+        return str(repr_dict)
+
     def update(self,other):
         with get_redis(self.system).pipeline() as pipe:
             for k,v in other.items():
@@ -197,3 +208,6 @@ class SetFu:
 
     def __contains__(self, item):
         return get_redis(self.system).sismember(self.name, item)
+
+    def __repr__(self):
+        return str(get_redis(self.system).smembers(self.name))
